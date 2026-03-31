@@ -60,9 +60,6 @@ VersionInfoCopyright=Copyright (C) 2026 Frank Borja
 VersionInfoProductName={#AppName}
 VersionInfoProductVersion={#AppVersion}
 
-; Wizard — imagen lateral y colores
-WizardImageFile=compiler:WizModernImage-IS.bmp
-WizardSmallImageFile=compiler:WizModernSmallImage-IS.bmp
 
 ; No mostrar la carpeta de destino (es transparente para el usuario)
 DisableDirPage=yes
