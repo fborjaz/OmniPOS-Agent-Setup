@@ -103,15 +103,17 @@ jobs:
 
           Write-Host "gobytel-agent.exe firmado correctamente."
 
-      # ── 9. Descargar NSSM ─────────────────────────────────────────────
-      - name: Descargar NSSM
+      # ── 9. Instalar NSSM via Chocolatey ──────────────────────────────────
+      - name: Instalar NSSM
         shell: powershell
         run: |
-          Invoke-WebRequest -Uri "https://nssm.cc/release/nssm-2.24.zip" -OutFile nssm.zip
-          Expand-Archive nssm.zip -DestinationPath nssm-temp -Force
-          Copy-Item "nssm-temp\nssm-2.24\win64\nssm.exe" "assets\nssm.exe" -Force
-          Remove-Item nssm.zip, nssm-temp -Recurse -Force
-          Write-Host "NSSM descargado: assets\nssm.exe"
+          choco install nssm --no-progress -y
+          $nssmExe = (Get-Command nssm -ErrorAction SilentlyContinue).Source
+          if (-not $nssmExe) {
+            $nssmExe = "C:\ProgramData\chocolatey\bin\nssm.exe"
+          }
+          Copy-Item $nssmExe "assets\nssm.exe" -Force
+          Write-Host "NSSM instalado: assets\nssm.exe"
 
       # ── 10. Instalar Inno Setup ────────────────────────────────────────
       - name: Instalar Inno Setup 6
