@@ -1,0 +1,27 @@
+{
+  "name": "gobytel-agent",
+  "version": "1.0.0",
+  "description": "GoByTel Agent - Servicio de hardware local para el sistema POS GoByTel",
+  "main": "src/agent.js",
+  "author": "Frank Borja <https://github.com/fborjaz>",
+  "license": "UNLICENSED",
+  "private": true,
+  "scripts": {
+    "start": "node src/agent.js",
+    "build": "npx pkg src/agent.js --target node18-win-x64 --output dist/gobytel-agent.exe"
+  },
+  "pkg": {
+    "assets": [
+      "src/**/*"
+    ],
+    "targets": [
+      "node18-win-x64"
+    ]
+  },
+  "dependencies": {
+    "ws": "^8.16.0"
+  },
+  "devDependencies": {
+    "pkg": "^5.8.1"
+  }
+}

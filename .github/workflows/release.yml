@@ -1,0 +1,198 @@
+name: Build, Sign and Release GoByTel Agent
+
+# Se activa automáticamente cuando haces: git tag v1.0.0 && git push origin v1.0.0
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write   # Necesario para crear la Release en GitHub
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 30
+
+    steps:
+      # ── 1. Código fuente ───────────────────────────────────────────────
+      - name: Checkout repositorio
+        uses: actions/checkout@v4
+
+      # ── 2. Node.js ────────────────────────────────────────────────────
+      - name: Configurar Node.js 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      # ── 3. Dependencias ────────────────────────────────────────────────
+      - name: Instalar dependencias
+        run: npm ci
+
+      # ── 4. Extraer versión del tag ─────────────────────────────────────
+      - name: Extraer versión
+        id: version
+        shell: bash
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          echo "Versión detectada: $VERSION"
+
+      # ── 5. Actualizar versión en agent.js ──────────────────────────────
+      - name: Actualizar VERSION en agent.js
+        shell: powershell
+        run: |
+          $version = "${{ steps.version.outputs.VERSION }}"
+          $file    = "src\agent.js"
+          (Get-Content $file) -replace "const VERSION = '[^']*'", "const VERSION = '$version'" | Set-Content $file
+          Write-Host "agent.js actualizado a v$version"
+
+      # ── 6. Compilar ejecutable con pkg ─────────────────────────────────
+      - name: Compilar gobytel-agent.exe
+        run: |
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          npx pkg src/agent.js --target node18-win-x64 --output dist/gobytel-agent.exe
+        shell: powershell
+
+      # ── 7. Importar certificado de firma ──────────────────────────────
+      - name: Importar certificado de firma digital
+        env:
+          PFX_BASE64:  ${{ secrets.CODESIGN_PFX_BASE64 }}
+          PFX_PASSWORD: ${{ secrets.CODESIGN_PFX_PASSWORD }}
+        shell: powershell
+        run: |
+          $bytes = [Convert]::FromBase64String($env:PFX_BASE64)
+          $pfxPath = Join-Path $env:RUNNER_TEMP "gobytel-cert.pfx"
+          [IO.File]::WriteAllBytes($pfxPath, $bytes)
+          Write-Host "Certificado importado correctamente."
+
+      # ── 8. Firmar el ejecutable ────────────────────────────────────────
+      - name: Firmar gobytel-agent.exe
+        env:
+          PFX_PASSWORD: ${{ secrets.CODESIGN_PFX_PASSWORD }}
+        shell: powershell
+        run: |
+          $pfxPath  = Join-Path $env:RUNNER_TEMP "gobytel-cert.pfx"
+          $signtool = Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" `
+                        -Recurse -Filter "signtool.exe" -ErrorAction SilentlyContinue |
+                        Sort-Object LastWriteTime -Descending |
+                        Select-Object -First 1 -ExpandProperty FullName
+
+          if (-not $signtool) { Write-Error "signtool.exe no encontrado"; exit 1 }
+
+          & $signtool sign `
+            /f  $pfxPath `
+            /p  $env:PFX_PASSWORD `
+            /fd sha256 `
+            /td sha256 `
+            /tr http://timestamp.sectigo.com `
+            /d  "GoByTel Agent" `
+            /du "https://github.com/fborjaz/OmniPOS-Agent-Setup" `
+            dist\gobytel-agent.exe
+
+          Write-Host "gobytel-agent.exe firmado correctamente."
+
+      # ── 9. Descargar NSSM ─────────────────────────────────────────────
+      - name: Descargar NSSM
+        shell: powershell
+        run: |
+          Invoke-WebRequest -Uri "https://nssm.cc/release/nssm-2.24.zip" -OutFile nssm.zip
+          Expand-Archive nssm.zip -DestinationPath nssm-temp -Force
+          Copy-Item "nssm-temp\nssm-2.24\win64\nssm.exe" "assets\nssm.exe" -Force
+          Remove-Item nssm.zip, nssm-temp -Recurse -Force
+          Write-Host "NSSM descargado: assets\nssm.exe"
+
+      # ── 10. Instalar Inno Setup ────────────────────────────────────────
+      - name: Instalar Inno Setup 6
+        run: choco install innosetup --no-progress -y
+        shell: powershell
+
+      # ── 11. Actualizar versión en setup.iss ───────────────────────────
+      - name: Actualizar versión en setup.iss
+        shell: powershell
+        run: |
+          $version = "${{ steps.version.outputs.VERSION }}"
+          $file    = "installer\setup.iss"
+          (Get-Content $file) -replace '#define AppVersion\s+"[^"]*"', "#define AppVersion `"$version`"" | Set-Content $file
+          Write-Host "setup.iss actualizado a v$version"
+
+      # ── 12. Compilar instalador ────────────────────────────────────────
+      - name: Compilar instalador con Inno Setup
+        shell: powershell
+        run: |
+          $iscc = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+          & $iscc installer\setup.iss
+          if ($LASTEXITCODE -ne 0) { Write-Error "Inno Setup falló"; exit 1 }
+          Write-Host "Instalador compilado correctamente."
+
+      # ── 13. Firmar el instalador ───────────────────────────────────────
+      - name: Firmar instalador
+        env:
+          PFX_PASSWORD: ${{ secrets.CODESIGN_PFX_PASSWORD }}
+        shell: powershell
+        run: |
+          $pfxPath   = Join-Path $env:RUNNER_TEMP "gobytel-cert.pfx"
+          $installer = Get-ChildItem -Path "dist" -Filter "GoByTel-Agent-Setup-*.exe" |
+                         Select-Object -First 1 -ExpandProperty FullName
+          $signtool  = Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" `
+                         -Recurse -Filter "signtool.exe" -ErrorAction SilentlyContinue |
+                         Sort-Object LastWriteTime -Descending |
+                         Select-Object -First 1 -ExpandProperty FullName
+
+          & $signtool sign `
+            /f  $pfxPath `
+            /p  $env:PFX_PASSWORD `
+            /fd sha256 `
+            /td sha256 `
+            /tr http://timestamp.sectigo.com `
+            /d  "GoByTel Agent Installer" `
+            /du "https://github.com/fborjaz/OmniPOS-Agent-Setup" `
+            $installer
+
+          Write-Host "Instalador firmado: $installer"
+
+      # ── 14. Generar changelog automático ──────────────────────────────
+      - name: Generar changelog
+        id: changelog
+        shell: bash
+        run: |
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
+          if [ -n "$PREV_TAG" ]; then
+            git log ${PREV_TAG}..HEAD --pretty=format:"- %s" >> $GITHUB_OUTPUT
+          else
+            echo "- Primera versión de GoByTel Agent" >> $GITHUB_OUTPUT
+          fi
+          echo "" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      # ── 15. Publicar en GitHub Releases ───────────────────────────────
+      - name: Publicar GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "GoByTel Agent v${{ steps.version.outputs.VERSION }}"
+          tag_name: "${{ steps.version.outputs.TAG }}"
+          body: |
+            ## GoByTel Agent v${{ steps.version.outputs.VERSION }}
+
+            ### ¿Qué hay de nuevo?
+            ${{ steps.changelog.outputs.CHANGELOG }}
+
+            ---
+
+            ### Instalación (primera vez)
+            1. Descarga `GoByTel-Agent-Setup-v${{ steps.version.outputs.VERSION }}.exe`
+            2. Ejecuta como **Administrador**
+            3. Sigue el asistente → listo
+
+            ### Actualización
+            Si ya tienes GoByTel Agent instalado, **se actualizará automáticamente** la próxima vez que se inicie el servicio. No necesitas hacer nada.
+
+            ---
+
+            > Firmado digitalmente por **Frank Borja** — GoByTel
+          files: dist/GoByTel-Agent-Setup-v${{ steps.version.outputs.VERSION }}.exe
+          draft: false
+          prerelease: false

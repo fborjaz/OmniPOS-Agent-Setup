@@ -1,0 +1,35 @@
+# Dependencias
+node_modules/
+
+# Builds generados
+dist/
+
+# Archivos temporales del build
+nssm-temp/
+nssm.zip
+
+# Certificados y claves — NUNCA subir a GitHub
+*.pfx
+*.p12
+*-b64.txt
+*-base64.txt
+
+# Configuración local del agente (generada en la PC del cliente)
+config.json
+
+# NSSM (se descarga en el build)
+assets/nssm.exe
+
+# Logs
+*.log
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
