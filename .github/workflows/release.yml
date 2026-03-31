@@ -186,7 +186,15 @@ jobs:
           echo "" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      # ── 15. Publicar en GitHub Releases ───────────────────────────────
+      # ── 15. Copiar installer con nombre fijo (URL permanente) ────────────
+      - name: Generar alias GoByTel-Agent-Setup-latest.exe
+        shell: powershell
+        run: |
+          Copy-Item "dist\GoByTel-Agent-Setup-v${{ steps.version.outputs.VERSION }}.exe" `
+                    "dist\GoByTel-Agent-Setup-latest.exe"
+          Write-Host "Alias creado: GoByTel-Agent-Setup-latest.exe"
+
+      # ── 16. Publicar en GitHub Releases ───────────────────────────────
       - name: Publicar GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -211,6 +219,8 @@ jobs:
             ---
 
             > Firmado digitalmente por **Frank Borja** — GoByTel
-          files: dist/GoByTel-Agent-Setup-v${{ steps.version.outputs.VERSION }}.exe
+          files: |
+            dist/GoByTel-Agent-Setup-v${{ steps.version.outputs.VERSION }}.exe
+            dist/GoByTel-Agent-Setup-latest.exe
           draft: false
           prerelease: false
