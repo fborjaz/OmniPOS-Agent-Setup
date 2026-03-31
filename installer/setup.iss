@@ -86,63 +86,26 @@ Name: "{group}\{#AppName}";          Filename: "{app}\{#AppExeName}"
 Name: "{group}\Desinstalar {#AppName}"; Filename: "{uninstallexe}"
 
 [Run]
-; ── PASO 1: Detener el servicio si ya existe (actualización) ─────────────
-Filename: "{app}\nssm.exe";
-  Parameters: "stop {#ServiceName}";
-  Flags: runhidden waituntilterminated;
-  StatusMsg: "Deteniendo servicio anterior...";
-  Check: ServiceExists
-
-; ── PASO 2: Eliminar servicio anterior ───────────────────────────────────
-Filename: "{app}\nssm.exe";
-  Parameters: "remove {#ServiceName} confirm";
-  Flags: runhidden waituntilterminated;
-  Check: ServiceExists
-
-; ── PASO 3: Registrar el nuevo servicio ──────────────────────────────────
-Filename: "{app}\nssm.exe";
-  Parameters: "install {#ServiceName} ""{app}\{#AppExeName}""";
-  Flags: runhidden waituntilterminated;
-  StatusMsg: "Registrando servicio de Windows..."
-
-; ── PASO 4: Configurar nombre visible del servicio ───────────────────────
-Filename: "{app}\nssm.exe";
-  Parameters: "set {#ServiceName} DisplayName ""{#AppName}""";
-  Flags: runhidden waituntilterminated
-
-; ── PASO 5: Configurar descripción ───────────────────────────────────────
-Filename: "{app}\nssm.exe";
-  Parameters: "set {#ServiceName} Description ""{#ServiceDesc}""";
-  Flags: runhidden waituntilterminated
-
-; ── PASO 6: Configurar inicio automático con Windows ─────────────────────
-Filename: "{app}\nssm.exe";
-  Parameters: "set {#ServiceName} Start SERVICE_AUTO_START";
-  Flags: runhidden waituntilterminated
-
-; ── PASO 7: Reiniciar automáticamente si el servicio falla ───────────────
-Filename: "{app}\nssm.exe";
-  Parameters: "set {#ServiceName} AppExit Default Restart";
-  Flags: runhidden waituntilterminated
-
-Filename: "{app}\nssm.exe";
-  Parameters: "set {#ServiceName} AppRestartDelay 5000";
-  Flags: runhidden waituntilterminated
-
-; ── PASO 8: Redirigir stdout/stderr al log ───────────────────────────────
-Filename: "{app}\nssm.exe";
-  Parameters: "set {#ServiceName} AppStdout ""{commonappdata}\GoByTel\agent.log""";
-  Flags: runhidden waituntilterminated
-
-Filename: "{app}\nssm.exe";
-  Parameters: "set {#ServiceName} AppStderr ""{commonappdata}\GoByTel\agent.log""";
-  Flags: runhidden waituntilterminated
-
-; ── PASO 9: Iniciar el servicio inmediatamente ───────────────────────────
-Filename: "{app}\nssm.exe";
-  Parameters: "start {#ServiceName}";
-  Flags: runhidden waituntilterminated;
-  StatusMsg: "Iniciando GoByTel Agent..."
+; Paso 1 — Detener servicio anterior (solo si existe)
+Filename: "{app}\nssm.exe"; Parameters: "stop {#ServiceName}"; Flags: runhidden waituntilterminated; StatusMsg: "Deteniendo servicio anterior..."; Check: ServiceExists
+; Paso 2 — Eliminar servicio anterior
+Filename: "{app}\nssm.exe"; Parameters: "remove {#ServiceName} confirm"; Flags: runhidden waituntilterminated; Check: ServiceExists
+; Paso 3 — Registrar nuevo servicio
+Filename: "{app}\nssm.exe"; Parameters: "install {#ServiceName} ""{app}\{#AppExeName}"""; Flags: runhidden waituntilterminated; StatusMsg: "Registrando servicio de Windows..."
+; Paso 4 — Nombre visible
+Filename: "{app}\nssm.exe"; Parameters: "set {#ServiceName} DisplayName ""{#AppName}"""; Flags: runhidden waituntilterminated
+; Paso 5 — Descripción
+Filename: "{app}\nssm.exe"; Parameters: "set {#ServiceName} Description ""{#ServiceDesc}"""; Flags: runhidden waituntilterminated
+; Paso 6 — Inicio automático
+Filename: "{app}\nssm.exe"; Parameters: "set {#ServiceName} Start SERVICE_AUTO_START"; Flags: runhidden waituntilterminated
+; Paso 7 — Reinicio automático en fallo
+Filename: "{app}\nssm.exe"; Parameters: "set {#ServiceName} AppExit Default Restart"; Flags: runhidden waituntilterminated
+Filename: "{app}\nssm.exe"; Parameters: "set {#ServiceName} AppRestartDelay 5000"; Flags: runhidden waituntilterminated
+; Paso 8 — Redirigir log
+Filename: "{app}\nssm.exe"; Parameters: "set {#ServiceName} AppStdout ""{commonappdata}\GoByTel\agent.log"""; Flags: runhidden waituntilterminated
+Filename: "{app}\nssm.exe"; Parameters: "set {#ServiceName} AppStderr ""{commonappdata}\GoByTel\agent.log"""; Flags: runhidden waituntilterminated
+; Paso 9 — Iniciar servicio
+Filename: "{app}\nssm.exe"; Parameters: "start {#ServiceName}"; Flags: runhidden waituntilterminated; StatusMsg: "Iniciando GoByTel Agent..."
 
 [UninstallRun]
 ; Detener y eliminar el servicio al desinstalar
