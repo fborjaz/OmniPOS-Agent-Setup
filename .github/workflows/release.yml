@@ -194,7 +194,34 @@ jobs:
                     "dist\GoByTel-Agent-Setup-latest.exe"
           Write-Host "Alias creado: GoByTel-Agent-Setup-latest.exe"
 
-      # ── 16. Publicar en GitHub Releases ───────────────────────────────
+      # ── 16. Deploy .exe al servidor GoByTel ──────────────────────────────
+      - name: Subir installer al servidor GoByTel
+        shell: bash
+        env:
+          DEPLOY_HOST:     ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER:     ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PASSWORD: ${{ secrets.DEPLOY_PASSWORD }}
+          VERSION:         ${{ steps.version.outputs.VERSION }}
+        run: |
+          # Instalar sshpass en el runner
+          choco install sshpass --no-progress -y > /dev/null 2>&1 || \
+            (apt-get install -y sshpass > /dev/null 2>&1)
+
+          DEST="/home/gobytel/htdocs/gobytel.com/uploads/downloads"
+
+          # Subir versión específica
+          sshpass -p "$DEPLOY_PASSWORD" scp -o StrictHostKeyChecking=no \
+            "dist/GoByTel-Agent-Setup-v${VERSION}.exe" \
+            "${DEPLOY_USER}@${DEPLOY_HOST}:${DEST}/GoByTel-Agent-Setup-v${VERSION}.exe"
+
+          # Subir alias latest (sobrescribe siempre)
+          sshpass -p "$DEPLOY_PASSWORD" scp -o StrictHostKeyChecking=no \
+            "dist/GoByTel-Agent-Setup-latest.exe" \
+            "${DEPLOY_USER}@${DEPLOY_HOST}:${DEST}/GoByTel-Agent-Setup-latest.exe"
+
+          echo "Deploy OK → https://gobytel.com/uploads/downloads/GoByTel-Agent-Setup-latest.exe"
+
+      # ── 17. Publicar en GitHub Releases (privado, solo como backup) ──────
       - name: Publicar GitHub Release
         uses: softprops/action-gh-release@v2
         with:
@@ -208,15 +235,8 @@ jobs:
 
             ---
 
-            ### Instalación (primera vez)
-            1. Descarga `GoByTel-Agent-Setup-v${{ steps.version.outputs.VERSION }}.exe`
-            2. Ejecuta como **Administrador**
-            3. Sigue el asistente → listo
-
-            ### Actualización
-            Si ya tienes GoByTel Agent instalado, **se actualizará automáticamente** la próxima vez que se inicie el servicio. No necesitas hacer nada.
-
-            ---
+            ### Descarga
+            https://gobytel.com/uploads/downloads/GoByTel-Agent-Setup-latest.exe
 
             > Firmado digitalmente por **Frank Borja** — GoByTel
           files: |
