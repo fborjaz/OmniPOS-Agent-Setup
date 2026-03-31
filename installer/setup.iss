@@ -35,8 +35,7 @@ DisableProgramGroupPage=yes
 OutputBaseFilename=GoByTel-Agent-Setup-v{#AppVersion}
 OutputDir=..\dist
 
-; Ícono y apariencia
-SetupIconFile=..\assets\icon.ico
+; Apariencia
 WizardStyle=modern
 WizardSizePercent=120
 
