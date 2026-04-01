@@ -41,10 +41,12 @@ jobs:
 
       # ── 5. Actualizar versión en package.json y constants.js ───────────
       - name: Actualizar version
-        shell: bash
+        shell: powershell
         run: |
           npm version ${{ steps.version.outputs.VERSION }} --no-git-tag-version
-          sed -i "s/const VERSION.*=.*/const VERSION     = '${{ steps.version.outputs.VERSION }}';/" src/shared/constants.js
+          $content = Get-Content src/shared/constants.js -Raw
+          $content = $content -replace "const VERSION\s*=.*", "const VERSION     = '${{ steps.version.outputs.VERSION }}';"
+          $content | Set-Content src/shared/constants.js
 
       # ── 6. Build + Sign + Package con electron-builder ─────────────────
       - name: Build Electron app
