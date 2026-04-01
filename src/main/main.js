@@ -27,7 +27,7 @@ function createSettingsWindow() {
     resizable:    false,
     maximizable:  false,
     fullscreenable: false,
-    skipTaskbar:  true,
+    skipTaskbar:  false,  // ✅ Mostrar en taskbar cuando esté abierta
     show:         false,
     icon:         path.join(__dirname, '..', '..', 'build', 'icon.ico'),
     title:        `${APP_NAME} v${VERSION}`,

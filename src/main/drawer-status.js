@@ -6,7 +6,7 @@ const config = require('./config');
 const logger = require('./logger');
 const { CMD_DRAWER_STATUS } = require('../shared/constants');
 
-let _status        = 'unknown'; // 'open' | 'closed' | 'unknown'
+let _status        = 'not_configured'; // 'open' | 'closed' | 'unknown' | 'not_configured'
 let _supportsQuery = true;      // Se desactiva si la impresora no responde
 let _timer         = null;
 let _listeners     = [];
@@ -71,6 +71,14 @@ function stop() {
 
 function restart() {
   stop();
+  const cfg = config.get();
+
+  if (!cfg.port) {
+    _status = 'not_configured';
+    _notify('not_configured');
+    return;
+  }
+
   _supportsQuery = true;
   _status = 'unknown';
   start();

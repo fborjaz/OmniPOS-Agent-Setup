@@ -31,10 +31,11 @@ function rebuildMenu() {
   const status = drawerStatus.getStatus();
 
   const statusLabel = {
-    open:    'Abierta',
-    closed:  'Cerrada',
-    unknown: 'Desconocido',
-  }[status] || 'Desconocido';
+    open:           'Abierta',
+    closed:         'Cerrada',
+    unknown:        'Desconectada',
+    not_configured: 'Sin Configurar',
+  }[status] || 'Desconectada';
 
   const updater = require('./updater');
   const updateInfo = updater.getStatus();

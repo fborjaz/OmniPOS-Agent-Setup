@@ -1,5 +1,8 @@
 appId: com.gobytel.agent
 productName: GoByTel Agent
+author:
+  name: Frank Borja
+  email: frank@gobytel.com
 
 directories:
   output: dist
@@ -12,6 +15,8 @@ files:
 win:
   target: nsis
   icon: build/icon.ico
+  certificateFile: null
+  certificatePassword: null
   signingHashAlgorithms:
     - sha256
 
@@ -25,8 +30,11 @@ nsis:
   deleteAppDataOnUninstall: false
   artifactName: "GoByTel-Agent-Setup-v${version}.${ext}"
   shortcutName: GoByTel Agent
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
 
 publish:
   provider: github
   owner: fborjaz
   repo: OmniPOS-Agent-Setup
+  releaseType: release

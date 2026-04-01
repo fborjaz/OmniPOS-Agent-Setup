@@ -1,4 +1,7 @@
-; ── Migración desde GoByTel Agent v1.x (NSSM service) ─────────────────────
+; ── GoByTel Agent Installer Script ─────────────────────────────────────────
+; © 2026 Frank Borja <https://github.com/fborjaz>
+;
+; Migración desde GoByTel Agent v1.x (NSSM service) ─────────────────────
 ; Este script detecta y elimina el servicio NSSM antiguo antes de instalar
 ; la nueva versión Electron. La config en ProgramData\GoByTel se preserva.
 

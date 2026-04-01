@@ -16,9 +16,10 @@ const elAutoStart     = $('#auto-start');
 
 // ── Labels de estado ─────────────────────────────────────────────────────
 const STATUS_LABELS = {
-  open:    'Abierta',
-  closed:  'Cerrada',
-  unknown: 'Desconocido',
+  open:           'Abierta',
+  closed:         'Cerrada',
+  unknown:        'Desconectada',
+  not_configured: 'Sin Configurar',
 };
 
 // ── Cargar puertos COM ───────────────────────────────────────────────────
