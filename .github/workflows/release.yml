@@ -43,7 +43,12 @@ jobs:
       - name: Actualizar version
         shell: powershell
         run: |
-          npm version ${{ steps.version.outputs.VERSION }} --no-git-tag-version
+          # Actualizar package.json directamente (npm version falla si ya está en esa versión)
+          $pkgContent = Get-Content package.json -Raw | ConvertFrom-Json
+          $pkgContent.version = "${{ steps.version.outputs.VERSION }}"
+          $pkgContent | ConvertTo-Json | Set-Content package.json
+
+          # Actualizar constants.js
           $content = Get-Content src/shared/constants.js -Raw
           $content = $content -replace "const VERSION\s*=.*", "const VERSION     = '${{ steps.version.outputs.VERSION }}';"
           $content | Set-Content src/shared/constants.js
