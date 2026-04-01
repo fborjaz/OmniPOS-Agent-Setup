@@ -20,7 +20,7 @@ const logger             = require('./logger');
 const updater            = require('./updater');
 
 // ── Versión embebida (se actualiza con cada release) ──────────────────────
-const VERSION = '1.0.0';
+const VERSION = '1.0.1';
 
 // ── Rutas de datos del agente ─────────────────────────────────────────────
 const DATA_DIR   = path.join(process.env.ProgramData || 'C:\\ProgramData', 'GoByTel');
@@ -99,8 +99,10 @@ function openDrawer(comPort) {
       }
     `.trim();
 
+    // -EncodedCommand (base64 UTF-16 LE) evita todo problema de escaping y newlines
+    const encoded = Buffer.from(ps, 'utf16le').toString('base64');
     exec(
-      `powershell -NoProfile -WindowStyle Hidden -Command "${ps.replace(/"/g, '\\"').replace(/\n/g, ' ')}"`,
+      `powershell -NoProfile -WindowStyle Hidden -EncodedCommand ${encoded}`,
       { timeout: 6000, windowsHide: true },
       (err, stdout, stderr) => {
         if (err) {
