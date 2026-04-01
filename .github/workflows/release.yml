@@ -84,13 +84,33 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
-      # ── 8. Workflow Completado ──────────────────────────────────────────────
-      # Los instaladores están en GitHub Releases
-      # Para deploy al servidor, ejecutar LOCALMENTE después de descargar:
-      #
-      #   $VERSION = "v2.0.4"
-      #   sshpass -p "Frank@08." scp -r "dist\GoByTel-Agent-Setup-*" \
-      #     devfrank@173.249.10.36:/home/gobytel/htdocs/gobytel.com/uploads/downloads/
-      #
-      # O usar Sublime Text SFTP (sftp-config.json) para auto-upload
-      # O ejecutar deploy.py script local con: python deploy.py "dist/*.exe"
+      # ── 8. Setup SSH para deploy ────────────────────────────────────────────
+      - name: Setup SSH key
+        shell: bash
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H 173.249.10.36 >> ~/.ssh/known_hosts 2>/dev/null
+
+      # ── 9. Deploy instaladores con SCP ──────────────────────────────────────
+      - name: Deploy instaladores al servidor
+        shell: bash
+        run: |
+          scp -i ~/.ssh/id_ed25519 \
+            dist/GoByTel-Agent-Setup-v${{ steps.version.outputs.VERSION }}.exe \
+            dist/GoByTel-Agent-Setup-latest.exe \
+            devfrank@173.249.10.36:/home/gobytel/htdocs/gobytel.com/uploads/downloads/
+
+          echo "✅ Deploy completado"
+
+      # ── 10. Cleanup versiones antiguas ──────────────────────────────────────
+      - name: Cleanup old versions
+        shell: bash
+        continue-on-error: true
+        run: |
+          ssh -i ~/.ssh/id_ed25519 devfrank@173.249.10.36 \
+            "cd /home/gobytel/htdocs/gobytel.com/uploads/downloads/ && \
+             ls -t GoByTel-Agent-Setup-v*.exe 2>/dev/null | tail -n +4 | xargs -r rm -v"
