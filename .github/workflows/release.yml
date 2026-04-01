@@ -72,23 +72,7 @@ jobs:
             Write-Host "Alias creado: GoByTel-Agent-Setup-latest.exe"
           }
 
-      # ── 7.5 Crear GitHub Release con archivos compilados ──────────────────
-      - name: Crear GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ steps.version.outputs.TAG }}
-          name: "GoByTel Agent v${{ steps.version.outputs.VERSION }}"
-          body: |
-            # GoByTel Agent v${{ steps.version.outputs.VERSION }}
-
-            Descarga el instalador para instalar GoByTel Agent en tu PC.
-          files: |
-            dist/GoByTel-Agent-Setup-v${{ steps.version.outputs.VERSION }}.exe
-            dist/GoByTel-Agent-Setup-latest.exe
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      # ── 7.75 Generar latest.yml para electron-updater ────────────────────
+      # ── 7.5 Generar latest.yml PRIMERO ────────────────────────────────────
       - name: Generar latest.yml
         shell: powershell
         run: |
@@ -109,12 +93,20 @@ files:
             Write-Host "✅ latest.yml creado"
           }
 
-      # ── 7.8 Subir latest.yml a GitHub Release ────────────────────────────
-      - name: Subir latest.yml a GitHub Release
+      # ── 7.6 Crear GitHub Release CON TODOS LOS ARCHIVOS ─────────────────────
+      - name: Crear GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.version.outputs.TAG }}
-          files: dist/latest.yml
+          name: "GoByTel Agent v${{ steps.version.outputs.VERSION }}"
+          body: |
+            # GoByTel Agent v${{ steps.version.outputs.VERSION }}
+
+            Descarga el instalador para instalar GoByTel Agent en tu PC.
+          files: |
+            dist/GoByTel-Agent-Setup-v${{ steps.version.outputs.VERSION }}.exe
+            dist/GoByTel-Agent-Setup-latest.exe
+            dist/latest.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
