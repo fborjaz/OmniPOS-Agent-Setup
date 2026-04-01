@@ -19,17 +19,17 @@ win:
     - sha256
 
 nsis:
-  oneClick: true
-  perMachine: true
+  oneClick: false
   allowToChangeInstallationDirectory: false
-  include: build/installer.nsh
+  perMachine: true
   installerIcon: build/icon.ico
   uninstallerIcon: build/icon.ico
-  deleteAppDataOnUninstall: false
+  installerHeader: null
   artifactName: "GoByTel-Agent-Setup-v${version}.${ext}"
   shortcutName: GoByTel Agent
   createDesktopShortcut: true
   createStartMenuShortcut: true
+  include: build/installer.nsh
 
 publish:
   provider: github

@@ -88,6 +88,36 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      # ── 7.75 Generar latest.yml para electron-updater ────────────────────
+      - name: Generar latest.yml
+        shell: powershell
+        run: |
+          $installer = Get-ChildItem -Path "dist" -Filter "GoByTel-Agent-Setup-v*.exe" | Select-Object -First 1
+          if ($installer) {
+            $hash = (Get-FileHash -Path $installer.FullName -Algorithm SHA512).Hash
+            $size = $installer.Length
+
+            $latestYml = @"
+version: ${{ steps.version.outputs.VERSION }}
+files:
+  - url: https://github.com/fborjaz/OmniPOS-Agent-Setup/releases/download/v${{ steps.version.outputs.VERSION }}/GoByTel-Agent-Setup-v${{ steps.version.outputs.VERSION }}.exe
+    sha512: $hash
+    size: $size
+"@
+
+            $latestYml | Out-File -FilePath "dist/latest.yml" -Encoding UTF8
+            Write-Host "✅ latest.yml creado"
+          }
+
+      # ── 7.8 Subir latest.yml a GitHub Release ────────────────────────────
+      - name: Subir latest.yml a GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.version.outputs.TAG }}
+          files: dist/latest.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 
       # ── 8. Setup SSH para deploy ────────────────────────────────────────────
       - name: Setup SSH key

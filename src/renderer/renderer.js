@@ -94,14 +94,16 @@ elTestDrawer.addEventListener("click", async () => {
   const result = await window.gobytel.testDrawer();
 
   if (result.success) {
-    elTestResult.textContent = `Gaveta abierta en ${result.port}`;
+    elTestResult.textContent = `✓ Pulso enviado a ${result.port}`;
     elTestResult.className = "test-result success";
   } else {
-    elTestResult.textContent = result.error;
+    elTestResult.textContent = `✗ ${result.error}`;
     elTestResult.className = "test-result error";
   }
 
-  elTestDrawer.disabled = false;
+  setTimeout(() => {
+    elTestDrawer.disabled = false;
+  }, 2000);
 });
 
 // Buscar actualizaciones

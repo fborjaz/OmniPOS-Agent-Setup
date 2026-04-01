@@ -5,6 +5,18 @@
 ; Este script detecta y elimina el servicio NSSM antiguo antes de instalar
 ; la nueva versión Electron. La config en ProgramData\GoByTel se preserva.
 
+!macro preInit
+  ; Mostrar página de licencia personalizada
+  !insertmacro MUI_PAGE_LICENSE_BEGIN
+    !insertmacro MUI_PAGE_LICENSE_END
+!macroend
+
+!macro customPreInstall
+  ; Mostrar acuerdo de licencia
+  MessageBox MB_YESNO "GoByTel Agent - ACUERDO DE LICENCIA$\n$\nCopyright © 2026 Frank Borja$\n$\nEsta aplicación es un puente de hardware para el sistema POS GoByTel.$\n$\n¿Acepta los términos y condiciones?" IDYES +2
+    Abort
+!macroend
+
 !macro customInstall
   ; Verificar si el servicio GoByTelAgent existe
   nsExec::ExecToLog 'sc query GoByTelAgent'

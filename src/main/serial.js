@@ -49,17 +49,33 @@ function openDrawer(comPort) {
       autoOpen: false,
     });
 
+    const timeout = setTimeout(() => {
+      try { port.close(); } catch (_) {}
+      reject(new Error('Timeout: dispositivo no responde (verifique que esté conectado)'));
+    }, 3000);
+
     port.open((err) => {
-      if (err) return reject(new Error(`No se pudo abrir ${comPort}: ${err.message}`));
+      if (err) {
+        clearTimeout(timeout);
+        return reject(new Error(`Puerto no accesible: ${err.message}`));
+      }
 
       port.write(CMD_OPEN_DRAWER, (wErr) => {
         if (wErr) {
+          clearTimeout(timeout);
           port.close();
-          return reject(new Error(`Error al escribir en ${comPort}: ${wErr.message}`));
+          return reject(new Error(`Error al escribir: ${wErr.message}`));
         }
+
+        // Intentar leer respuesta (opcional, algunos dispositivos responden)
+        let gotResponse = false;
+        port.once('data', () => {
+          gotResponse = true;
+        });
 
         // Esperar 200ms para que el pulso llegue, luego cerrar
         setTimeout(() => {
+          clearTimeout(timeout);
           port.close((cErr) => {
             if (cErr) logger.warn(`Error al cerrar ${comPort}: ${cErr.message}`);
             resolve();
