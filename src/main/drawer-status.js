@@ -1,15 +1,15 @@
-'use strict';
+"use strict";
 
-const { BrowserWindow } = require('electron');
-const serial = require('./serial');
-const config = require('./config');
-const logger = require('./logger');
-const { CMD_DRAWER_STATUS } = require('../shared/constants');
+const { BrowserWindow } = require("electron");
+const serial = require("./serial");
+const config = require("./config");
+const logger = require("./logger");
+const { CMD_DRAWER_STATUS } = require("../shared/constants");
 
-let _status        = 'not_configured'; // 'open' | 'closed' | 'unknown' | 'not_configured'
-let _supportsQuery = true;      // Se desactiva si la impresora no responde
-let _timer         = null;
-let _listeners     = [];
+let _status = "not_configured"; // 'open' | 'closed' | 'unknown' | 'not_configured'
+let _supportsQuery = true; // Se desactiva si la impresora no responde
+let _timer = null;
+let _listeners = [];
 
 function getStatus() {
   return _status;
@@ -17,18 +17,20 @@ function getStatus() {
 
 function onStatusChange(fn) {
   _listeners.push(fn);
-  return () => { _listeners = _listeners.filter(l => l !== fn); };
+  return () => {
+    _listeners = _listeners.filter((l) => l !== fn);
+  };
 }
 
 function _notify(newStatus) {
   if (newStatus === _status) return;
   _status = newStatus;
-  _listeners.forEach(fn => fn(_status));
+  _listeners.forEach((fn) => fn(_status));
 
   // Notificar a todas las ventanas renderer abiertas
-  BrowserWindow.getAllWindows().forEach(win => {
+  BrowserWindow.getAllWindows().forEach((win) => {
     if (!win.isDestroyed()) {
-      win.webContents.send('drawer-status-changed', _status);
+      win.webContents.send("drawer-status-changed", _status);
     }
   });
 }
@@ -43,14 +45,14 @@ async function _poll() {
     // bit 0 = 0: gaveta cerrada, bit 0 = 1: gaveta abierta
     if (response && response.length > 0) {
       const drawerBit = response[0] & 0x01;
-      _notify(drawerBit === 0 ? 'closed' : 'open');
+      _notify(drawerBit === 0 ? "closed" : "open");
     }
   } catch (_) {
     // Si falla, marcar como no soportado y parar polling
     if (_supportsQuery) {
       _supportsQuery = false;
-      logger.info('Impresora no soporta DLE EOT — estado gaveta desconocido.');
-      _notify('unknown');
+      logger.info("Impresora no soporta DLE EOT — estado gaveta desconocido.");
+      _notify("unknown");
     }
   }
 }
@@ -74,13 +76,13 @@ function restart() {
   const cfg = config.get();
 
   if (!cfg.port) {
-    _status = 'not_configured';
-    _notify('not_configured');
+    _status = "not_configured";
+    _notify("not_configured");
     return;
   }
 
   _supportsQuery = true;
-  _status = 'unknown';
+  _status = "unknown";
   start();
 }
 
