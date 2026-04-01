@@ -1,80 +1,47 @@
 # GoByTel Agent
 
-> Servicio de hardware local para el sistema POS GoByTel.  
-> Permite al navegador controlar hardware físico (gaveta de caja, impresoras) sin ninguna configuración por parte del cliente.
+> Hardware bridge para el sistema POS GoByTel.
+> Controla la gaveta de caja registradora desde el navegador via WebSocket.
 
-**Autor:** [Frank Borja](https://github.com/fborjaz)  
-**Versión:** 1.0.0  
-**Licencia:** Propietario — GoByTel / Frank Borja. Todos los derechos reservados.
+**Autor:** [Frank Borja](https://github.com/fborjaz)
+**Version:** 2.0.0
+**Licencia:** Propietario
 
 ---
 
 ## Para el cliente
 
-El cliente solo ejecuta `GoByTel-Agent-Setup-vX.X.X.exe` **una sola vez**.  
-Después de esa instalación el agente:
-
-- Se instala como **servicio de Windows** y arranca automáticamente con el PC
-- Se **actualiza solo** al detectar una nueva versión en GitHub — sin intervención manual
-- Está **firmado digitalmente** por Frank Borja
-
-No se necesita ningún paso adicional.
+Ejecutar `GoByTel-Agent-Setup-vX.X.X.exe` una sola vez.
+El agente se instala, arranca con Windows y se actualiza automaticamente.
 
 ---
 
-## ¿Qué hace?
+## Funcionalidades
 
-| Versión | Funcionalidad |
-|---------|--------------|
-| v1.0.0  | Apertura de gaveta de caja registradora vía WebSocket (`ws://localhost:9100`) |
-| v1.1.0+ | *(próximas funcionalidades)* |
+- Apertura de gaveta via WebSocket (`ws://localhost:9100`)
+- Deteccion de estado de gaveta (abierta/cerrada)
+- Interfaz grafica minimalista con tema oscuro
+- Icono en bandeja del sistema con menu contextual
+- Selector de puerto COM
+- Auto-actualizacion desde GitHub Releases
+- Auto-inicio con Windows
 
-### Comunicación con el POS
+---
 
-El POS (navegador) se comunica con el agente vía WebSocket local:
+## Comunicacion con el POS
 
 ```javascript
 const ws = new WebSocket("ws://localhost:9100");
 
 // Abrir gaveta
 ws.onopen = () => ws.send(JSON.stringify({ action: "open_drawer" }));
-ws.onmessage = (e) => console.log(JSON.parse(e.data));
-// → { success: true, port: "COM3", version: "1.0.0" }
 
 // Health check
 ws.send(JSON.stringify({ action: "ping" }));
-// → { success: true, version: "1.0.0", port: "COM3" }
+
+// Estado gaveta
+ws.send(JSON.stringify({ action: "drawer_status" }));
 ```
-
-### Configuración (auto-generada)
-
-`C:\ProgramData\GoByTel\config.json`
-```json
-{ "port": "COM3", "ws_port": 9100 }
-```
-
-El puerto COM se detecta automáticamente en el primer arranque y se re-detecta si cambia.
-
-### Logs
-
-`C:\ProgramData\GoByTel\agent.log` — rotación automática al superar 5 MB.
-
----
-
-## Publicar una nueva versión
-
-```bash
-# 1. Actualizar version en package.json
-# 2. Commit
-git add .
-git commit -m "chore: release v1.1.0"
-
-# 3. Tag → dispara GitHub Actions automáticamente
-git tag v1.1.0
-git push origin v1.1.0
-```
-
-GitHub Actions compila, firma y publica el Release. Los agentes instalados se actualizan solos.
 
 ---
 
@@ -82,12 +49,37 @@ GitHub Actions compila, firma y publica el Release. Los agentes instalados se ac
 
 ```
 src/
-├── agent.js     — WebSocket server + control de gaveta (PowerShell/COM)
-├── updater.js   — Auto-actualización desde GitHub Releases
-└── logger.js    — Log con rotación automática
-installer/
-└── setup.iss    — Script Inno Setup (servicio NSSM, auto-start, creditos)
-.github/
-└── workflows/
-    └── release.yml  — CI/CD: build + firma digital + GitHub Release
+  main/
+    main.js              — Entry point Electron + IPC
+    tray.js              — System tray + context menu
+    websocket-server.js  — WebSocket server (puerto 9100)
+    serial.js            — Control COM port (serialport)
+    drawer-status.js     — Polling DLE EOT
+    config.js            — Configuracion persistente
+    logger.js            — Log con rotacion
+    updater.js           — Auto-update (electron-updater)
+    preload.js           — Bridge IPC renderer<->main
+  renderer/
+    index.html           — Ventana configuracion
+    styles.css           — Tema oscuro
+    renderer.js          — Logica UI
+  shared/
+    constants.js         — Constantes compartidas
+build/
+    installer.nsh        — Migracion NSSM v1.x
+    icon.ico             — Icono app
+```
+
+---
+
+## Publicar nueva version
+
+```bash
+# 1. Commit
+git add .
+git commit -m "chore: release v2.1.0"
+
+# 2. Tag (dispara GitHub Actions)
+git tag v2.1.0
+git push origin v2.1.0
 ```

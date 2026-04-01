@@ -1,0 +1,232 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-size: 13px;
+  background: #1e1e2e;
+  color: #cdd6f4;
+  user-select: none;
+  overflow: hidden;
+}
+
+.container {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100vh;
+}
+
+/* ── Header ────────────────────────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 4px;
+}
+
+.logo {
+  border-radius: 6px;
+}
+
+.header-text h1 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #f5a623;
+  line-height: 1.2;
+}
+
+.version {
+  font-size: 11px;
+  color: #6c7086;
+}
+
+/* ── Sections ──────────────────────────────────────────────────────── */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.field label {
+  font-size: 13px;
+  color: #a6adc8;
+  font-weight: 500;
+  min-width: 120px;
+}
+
+.field-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.value {
+  font-size: 13px;
+  color: #cdd6f4;
+}
+
+/* ── Select ────────────────────────────────────────────────────────── */
+select {
+  background: #313244;
+  color: #cdd6f4;
+  border: 1px solid #45475a;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-family: inherit;
+  min-width: 120px;
+  cursor: pointer;
+  outline: none;
+}
+
+select:focus {
+  border-color: #f5a623;
+}
+
+/* ── Buttons ───────────────────────────────────────────────────────── */
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn-primary {
+  background: #f5a623;
+  color: #1e1e2e;
+}
+
+.btn-primary:hover {
+  background: #f0b84d;
+}
+
+.btn-primary:disabled {
+  background: #45475a;
+  color: #6c7086;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-secondary {
+  background: #313244;
+  color: #cdd6f4;
+  border: 1px solid #45475a;
+}
+
+.btn-secondary:hover {
+  background: #45475a;
+}
+
+.btn-icon {
+  background: transparent;
+  border: 1px solid #45475a;
+  color: #a6adc8;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s;
+}
+
+.btn-icon:hover {
+  background: #313244;
+  color: #f5a623;
+}
+
+/* ── Status indicator ──────────────────────────────────────────────── */
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #6c7086;
+  flex-shrink: 0;
+}
+
+.status-dot.closed {
+  background: #a6e3a1;
+  box-shadow: 0 0 6px #a6e3a140;
+}
+
+.status-dot.open {
+  background: #f38ba8;
+  box-shadow: 0 0 6px #f38ba840;
+}
+
+.status-dot.unknown {
+  background: #6c7086;
+}
+
+/* ── Test result ───────────────────────────────────────────────────── */
+.test-result {
+  font-size: 12px;
+  min-height: 16px;
+}
+
+.test-result.success {
+  color: #a6e3a1;
+}
+
+.test-result.error {
+  color: #f38ba8;
+}
+
+/* ── Divider ───────────────────────────────────────────────────────── */
+.divider {
+  border: none;
+  border-top: 1px solid #313244;
+}
+
+/* ── Checkbox ──────────────────────────────────────────────────────── */
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #a6adc8;
+}
+
+.checkbox-row input[type="checkbox"] {
+  accent-color: #f5a623;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+/* ── Footer ────────────────────────────────────────────────────────── */
+.footer {
+  margin-top: auto;
+  text-align: center;
+  font-size: 11px;
+  color: #585b70;
+  padding-top: 8px;
+}

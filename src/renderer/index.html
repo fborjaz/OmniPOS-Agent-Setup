@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline';">
+  <title>GoByTel Agent</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <img src="../../build/icon.ico" alt="GoByTel" class="logo" width="32" height="32">
+      <div class="header-text">
+        <h1>GoByTel Agent</h1>
+        <span class="version" id="version">v2.0.0</span>
+      </div>
+    </div>
+
+    <!-- Puerto COM -->
+    <div class="section">
+      <div class="field">
+        <label>Puerto COM</label>
+        <div class="field-row">
+          <select id="com-port">
+            <option value="">Detectando...</option>
+          </select>
+          <button id="btn-refresh-ports" class="btn-icon" title="Recargar puertos">&#x21bb;</button>
+        </div>
+      </div>
+
+      <!-- Estado Gaveta -->
+      <div class="field">
+        <label>Estado Gaveta</label>
+        <div class="status-row">
+          <span class="status-dot" id="drawer-dot"></span>
+          <span id="drawer-status">Desconocido</span>
+        </div>
+      </div>
+
+      <!-- Boton Test -->
+      <button id="btn-test-drawer" class="btn btn-primary">
+        Probar Gaveta
+      </button>
+      <span id="test-result" class="test-result"></span>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Actualizaciones -->
+    <div class="section">
+      <div class="field">
+        <label>Version actual</label>
+        <span class="value" id="current-version">v2.0.0</span>
+      </div>
+      <div class="field">
+        <label>Estado</label>
+        <span class="value" id="update-status">Verificando...</span>
+      </div>
+      <button id="btn-check-update" class="btn btn-secondary">
+        Buscar Actualizaciones
+      </button>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Opciones -->
+    <div class="section">
+      <label class="checkbox-row">
+        <input type="checkbox" id="auto-start" checked>
+        <span>Iniciar con Windows</span>
+      </label>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <span>Desarrollado por Frank Borja</span>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

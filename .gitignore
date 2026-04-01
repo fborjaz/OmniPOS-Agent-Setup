@@ -4,26 +4,19 @@ node_modules/
 # Builds generados
 dist/
 
-# Archivos temporales del build
-nssm-temp/
-nssm.zip
-
-# Certificados y claves — NUNCA subir a GitHub
+# Certificados y claves
 *.pfx
 *.p12
 *-b64.txt
 *-base64.txt
 
-# Configuración local del agente (generada en la PC del cliente)
+# Configuracion local del agente
 config.json
-
-# NSSM (se descarga en el build)
-assets/nssm.exe
 
 # Logs
 *.log
 
-# Notas privadas del desarrollador (nunca subir)
+# Notas privadas del desarrollador
 DEV_NOTES.md
 
 # Editor

@@ -1,27 +1,23 @@
 {
   "name": "gobytel-agent",
-  "version": "1.0.4",
-  "description": "GoByTel Agent - Servicio de hardware local para el sistema POS GoByTel",
-  "main": "src/agent.js",
+  "version": "2.0.0",
+  "description": "GoByTel Agent - Hardware bridge para el sistema POS GoByTel",
+  "main": "src/main/main.js",
   "author": "Frank Borja <https://github.com/fborjaz>",
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
-    "start": "node src/agent.js",
-    "build": "npx pkg src/agent.js --target node18-win-x64 --output dist/gobytel-agent.exe"
-  },
-  "pkg": {
-    "assets": [
-      "src/**/*"
-    ],
-    "targets": [
-      "node18-win-x64"
-    ]
+    "start": "electron .",
+    "build": "electron-builder --win",
+    "postinstall": "electron-builder install-app-deps"
   },
   "dependencies": {
-    "ws": "^8.16.0"
+    "ws": "^8.16.0",
+    "serialport": "^12.0.0",
+    "electron-updater": "^6.3.0"
   },
   "devDependencies": {
-    "pkg": "^5.8.1"
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
   }
 }
