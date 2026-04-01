@@ -83,30 +83,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # ── 8. Deploy al servidor GoByTel (ssh-action funciona en Windows) ──────
-      - name: Subir installer al servidor GoByTel
-        uses: appleboy/ssh-action@master
-        continue-on-error: true
-        with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USER }}
-          password: ${{ secrets.DEPLOY_PASSWORD }}
-          script: |
-            mkdir -p /home/gobytel/htdocs/gobytel.com/uploads/downloads/
-            cd /home/gobytel/htdocs/gobytel.com/uploads/downloads/
-            # Cleanup old versions (keep last 3)
-            ls -t GoByTel-Agent-Setup-v*.exe 2>/dev/null | tail -n +4 | xargs -r rm
 
-      # ── 9. Enviar instaladores con rsync ───────────────────────────────────
-      - name: Enviar instaladores con rsync
-        shell: bash
-        env:
-          DEPLOY_PASSWORD: ${{ secrets.DEPLOY_PASSWORD }}
-        continue-on-error: true
-        run: |
-          which sshpass > /dev/null || choco install sshpass -y
-          sshpass -p "$DEPLOY_PASSWORD" rsync -avz --delete-after \
-            "dist/GoByTel-Agent-Setup-v${{ steps.version.outputs.VERSION }}.exe" \
-            "dist/GoByTel-Agent-Setup-latest.exe" \
-            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/home/gobytel/htdocs/gobytel.com/uploads/downloads/" \
-            || echo "Note: rsync upload may have failed but workflow continues"
+      # ── 8. Workflow Completado ──────────────────────────────────────────────
+      # Los instaladores están en GitHub Releases
+      # Para deploy al servidor, ejecutar LOCALMENTE después de descargar:
+      #
+      #   $VERSION = "v2.0.4"
+      #   sshpass -p "Frank@08." scp -r "dist\GoByTel-Agent-Setup-*" \
+      #     devfrank@173.249.10.36:/home/gobytel/htdocs/gobytel.com/uploads/downloads/
+      #
+      # O usar Sublime Text SFTP (sftp-config.json) para auto-upload
+      # O ejecutar deploy.py script local con: python deploy.py "dist/*.exe"
