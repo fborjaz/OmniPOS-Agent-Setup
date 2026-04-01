@@ -60,9 +60,8 @@ jobs:
       - name: Incrustar icono en gobytel-agent.exe
         shell: powershell
         run: |
-          npm install -g rcedit
-          rcedit dist\gobytel-agent.exe --set-icon assets\Icono.ico
-          Write-Host "Icono incrustado correctamente."
+          npm install rcedit --no-save
+          node -e "require('rcedit')('dist/gobytel-agent.exe', { icon: 'assets/Icono.ico' }).then(() => console.log('Icono incrustado OK')).catch(e => { console.error(e.message); process.exit(1) })"
 
       # ── 7. Importar certificado de firma ──────────────────────────────
       - name: Importar certificado de firma digital
