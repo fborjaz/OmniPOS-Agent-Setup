@@ -91,14 +91,13 @@ jobs:
           if ($installer) {
             $hash = (Get-FileHash -Path $installer.FullName -Algorithm SHA512).Hash
             $size = $installer.Length
-            $content = @"
-version: ${{ steps.version.outputs.VERSION }}
-files:
-  - url: https://github.com/fborjaz/OmniPOS-Agent-Setup/releases/download/v${{ steps.version.outputs.VERSION }}/GoByTel-Agent-Setup-v${{ steps.version.outputs.VERSION }}.exe
-    sha512: $hash
-    size: $size
-"@
-            Set-Content -Path "dist/latest.yml" -Value $content -Encoding UTF8
+            $yml = @()
+            $yml += "version: ${{ steps.version.outputs.VERSION }}"
+            $yml += "files:"
+            $yml += "  - url: https://github.com/fborjaz/OmniPOS-Agent-Setup/releases/download/v${{ steps.version.outputs.VERSION }}/GoByTel-Agent-Setup-v${{ steps.version.outputs.VERSION }}.exe"
+            $yml += "    sha512: $hash"
+            $yml += "    size: $size"
+            $yml -join "`n" | Out-File -FilePath "dist/latest.yml" -Encoding UTF8
             Write-Host "latest.yml creado"
           }
 
