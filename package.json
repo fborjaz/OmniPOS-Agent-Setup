@@ -1,6 +1,6 @@
 {
   "name": "gobytel-agent",
-  "version": "2.0.1",
+  "version": "1.0.0",
   "description": "GoByTel Agent - Hardware bridge para el sistema POS GoByTel",
   "main": "src/main/main.js",
   "author": "Frank Borja <https://github.com/fborjaz>",

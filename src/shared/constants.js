@@ -3,7 +3,7 @@
 const path = require('path');
 
 const APP_NAME    = 'GoByTel Agent';
-const VERSION     = '2.0.1';
+const VERSION     = '1.0.0';
 const WS_PORT     = 9100;
 const BAUD_RATE   = 9600;
 const DATA_DIR    = path.join(process.env.ProgramData || 'C:\\ProgramData', 'GoByTel');
