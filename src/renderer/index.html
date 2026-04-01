@@ -14,59 +14,69 @@
       <img src="../../build/icon.ico" alt="GoByTel" class="logo" width="32" height="32">
       <div class="header-text">
         <h1>GoByTel Agent</h1>
-        <span class="version" id="version">v2.0.0</span>
+        <span class="version" id="version">v1.0.0</span>
       </div>
     </div>
 
-    <!-- Puerto COM -->
-    <div class="section">
-      <div class="field">
+    <!-- Puerto COM (Configuración) -->
+    <div class="section compact">
+      <div class="field-inline">
         <label>Puerto COM</label>
         <div class="field-row">
           <select id="com-port">
             <option value="">Detectando...</option>
           </select>
-          <button id="btn-refresh-ports" class="btn-icon" title="Recargar puertos">&#x21bb;</button>
+          <button id="btn-refresh-ports" class="btn-icon" title="Recargar puertos">↻</button>
         </div>
       </div>
+    </div>
 
-      <!-- Estado Gaveta -->
-      <div class="field">
-        <label>Estado Gaveta</label>
-        <div class="status-row">
+    <!-- Gaveta - Sección Principal -->
+    <div class="section main-section">
+      <div class="drawer-status-card">
+        <div class="status-indicator">
           <span class="status-dot" id="drawer-dot"></span>
-          <span id="drawer-status">Desconocido</span>
+          <div class="status-text">
+            <span class="status-label">Gaveta</span>
+            <span id="drawer-status" class="status-value">Desconectada</span>
+          </div>
         </div>
       </div>
 
-      <!-- Boton Test -->
-      <button id="btn-test-drawer" class="btn btn-primary">
-        Probar Gaveta
+      <button id="btn-test-drawer" class="btn btn-primary btn-large">
+        🔓 Abrir Gaveta
       </button>
       <span id="test-result" class="test-result"></span>
     </div>
 
-    <hr class="divider">
-
-    <!-- Actualizaciones -->
-    <div class="section">
-      <div class="field">
-        <label>Version actual</label>
-        <span class="value" id="current-version">v2.0.0</span>
+    <!-- Datos de Venta -->
+    <div class="section sale-info">
+      <div class="sale-field">
+        <label>Total Venta</label>
+        <input type="number" id="sale-total" placeholder="$0.00" readonly class="value-display">
       </div>
-      <div class="field">
-        <label>Estado</label>
-        <span class="value" id="update-status">Verificando...</span>
+      <div class="sale-field">
+        <label>Dinero Recibido</label>
+        <input type="number" id="paid-amount" placeholder="$0.00" readonly class="value-display">
       </div>
-      <button id="btn-check-update" class="btn btn-secondary">
-        Buscar Actualizaciones
-      </button>
+      <div class="sale-field">
+        <label>Cambio</label>
+        <input type="number" id="change-amount" placeholder="$0.00" readonly class="value-display highlight">
+      </div>
     </div>
 
     <hr class="divider">
 
+    <!-- Versión y Estado -->
+    <div class="section compact">
+      <div class="field-inline">
+        <span class="label-text">v<span id="current-version">1.0.0</span></span>
+        <span id="update-status" class="status-small">Al día</span>
+      </div>
+    </div>
+
     <!-- Opciones -->
-    <div class="section">
+    <div class="section compact">
       <label class="checkbox-row">
         <input type="checkbox" id="auto-start" checked>
         <span>Iniciar con Windows</span>

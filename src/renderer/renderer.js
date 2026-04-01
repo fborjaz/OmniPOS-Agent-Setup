@@ -11,8 +11,10 @@ const elTestDrawer = $("#btn-test-drawer");
 const elTestResult = $("#test-result");
 const elCurrentVer = $("#current-version");
 const elUpdateStatus = $("#update-status");
-const elCheckUpdate = $("#btn-check-update");
 const elAutoStart = $("#auto-start");
+const elSaleTotal = $("#sale-total");
+const elPaidAmount = $("#paid-amount");
+const elChangeAmount = $("#change-amount");
 
 // ── Labels de estado ─────────────────────────────────────────────────────
 const STATUS_LABELS = {
@@ -125,6 +127,31 @@ elAutoStart.addEventListener("change", () => {
 // ── Suscripciones a eventos del main process ─────────────────────────────
 window.gobytel.onDrawerStatusChange((status) => updateDrawerUI(status));
 window.gobytel.onUpdateStatusChange((info) => updateUpdateUI(info));
+
+// ── Recibir datos de venta desde POS ─────────────────────────────────────
+function setSaleData(total, paid) {
+  const totalNum = parseFloat(total) || 0;
+  const paidNum = parseFloat(paid) || 0;
+  const change = Math.max(0, paidNum - totalNum);
+
+  elSaleTotal.value = `$${totalNum.toFixed(2)}`;
+  elPaidAmount.value = `$${paidNum.toFixed(2)}`;
+  elChangeAmount.value = `$${change.toFixed(2)}`;
+
+  // Destaca el cambio si hay
+  if (change > 0) {
+    elChangeAmount.classList.add("highlight");
+  } else {
+    elChangeAmount.classList.remove("highlight");
+  }
+}
+
+// Escuchar si se envían datos de venta
+if (window.gobytel && window.gobytel.onSaleData) {
+  window.gobytel.onSaleData((total, paid) => {
+    setSaleData(total, paid);
+  });
+}
 
 // ── Inicialización ───────────────────────────────────────────────────────
 (async function init() {
