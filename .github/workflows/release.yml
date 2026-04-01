@@ -203,30 +203,15 @@ jobs:
 
       # ── 16. Deploy .exe al servidor GoByTel ──────────────────────────────
       - name: Subir installer al servidor GoByTel
-        shell: bash
-        env:
-          DEPLOY_HOST:     ${{ secrets.DEPLOY_HOST }}
-          DEPLOY_USER:     ${{ secrets.DEPLOY_USER }}
-          DEPLOY_PASSWORD: ${{ secrets.DEPLOY_PASSWORD }}
-          VERSION:         ${{ steps.version.outputs.VERSION }}
-        run: |
-          # Instalar sshpass en el runner
-          choco install sshpass --no-progress -y > /dev/null 2>&1 || \
-            (apt-get install -y sshpass > /dev/null 2>&1)
-
-          DEST="/home/gobytel/htdocs/gobytel.com/uploads/downloads"
-
-          # Subir versión específica
-          sshpass -p "$DEPLOY_PASSWORD" scp -o StrictHostKeyChecking=no \
-            "dist/GoByTel-Agent-Setup-v${VERSION}.exe" \
-            "${DEPLOY_USER}@${DEPLOY_HOST}:${DEST}/GoByTel-Agent-Setup-v${VERSION}.exe"
-
-          # Subir alias latest (sobrescribe siempre)
-          sshpass -p "$DEPLOY_PASSWORD" scp -o StrictHostKeyChecking=no \
-            "dist/GoByTel-Agent-Setup-latest.exe" \
-            "${DEPLOY_USER}@${DEPLOY_HOST}:${DEST}/GoByTel-Agent-Setup-latest.exe"
-
-          echo "Deploy OK → https://gobytel.com/uploads/downloads/GoByTel-Agent-Setup-latest.exe"
+        uses: appleboy/scp-action@v0.1.7
+        continue-on-error: true
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          password: ${{ secrets.DEPLOY_PASSWORD }}
+          source: "dist/GoByTel-Agent-Setup-v${{ steps.version.outputs.VERSION }}.exe,dist/GoByTel-Agent-Setup-latest.exe"
+          target: "/home/gobytel/htdocs/gobytel.com/uploads/downloads/"
+          strip_components: 1
 
       # ── 17. Publicar en GitHub Releases (privado, solo como backup) ──────
       - name: Publicar GitHub Release
