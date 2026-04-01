@@ -56,6 +56,14 @@ jobs:
           npx pkg src/agent.js --target node18-win-x64 --output dist/gobytel-agent.exe
         shell: powershell
 
+      # ── 6b. Incrustar icono en el ejecutable ──────────────────────────
+      - name: Incrustar icono en gobytel-agent.exe
+        shell: powershell
+        run: |
+          npm install -g rcedit
+          rcedit dist\gobytel-agent.exe --set-icon assets\Icono.ico
+          Write-Host "Icono incrustado correctamente."
+
       # ── 7. Importar certificado de firma ──────────────────────────────
       - name: Importar certificado de firma digital
         env:

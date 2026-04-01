@@ -1,6 +1,6 @@
 {
   "name": "gobytel-agent",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "GoByTel Agent - Servicio de hardware local para el sistema POS GoByTel",
   "main": "src/agent.js",
   "author": "Frank Borja <https://github.com/fborjaz>",

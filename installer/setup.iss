@@ -4,7 +4,7 @@
 ; ============================================================
 
 #define AppName      "GoByTel Agent"
-#define AppVersion   "1.0.0"
+#define AppVersion   "1.0.2"
 #define AppPublisher "Frank Borja"
 #define AppURL       "https://github.com/fborjaz/OmniPOS-Agent-Setup"
 #define AppExeName   "gobytel-agent.exe"
@@ -38,6 +38,7 @@ OutputDir=..\dist
 ; Apariencia
 WizardStyle=modern
 WizardSizePercent=120
+SetupIconFile=..\assets\Icono.ico
 
 ; Compresión máxima
 Compression=lzma2/ultra64
@@ -80,10 +81,13 @@ Source: "..\dist\{#AppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 ; NSSM — gestor de servicios Windows
 Source: "..\assets\nssm.exe"; DestDir: "{app}"; Flags: ignoreversion
 
+; Icono GoByTel
+Source: "..\assets\Icono.ico"; DestDir: "{app}"; Flags: ignoreversion
+
 [Icons]
 ; Acceso directo en el menú inicio
-Name: "{group}\{#AppName}";          Filename: "{app}\{#AppExeName}"
-Name: "{group}\Desinstalar {#AppName}"; Filename: "{uninstallexe}"
+Name: "{group}\{#AppName}";             Filename: "{app}\{#AppExeName}";  IconFilename: "{app}\Icono.ico"
+Name: "{group}\Desinstalar {#AppName}"; Filename: "{uninstallexe}";       IconFilename: "{app}\Icono.ico"
 
 [Run]
 ; Paso 1 — Detener servicio anterior (solo si existe)
