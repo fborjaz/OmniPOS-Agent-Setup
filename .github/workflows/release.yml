@@ -107,11 +107,54 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           tag_name: ${{ steps.version.outputs.TAG }}
-          name: "GoByTel Agent v${{ steps.version.outputs.VERSION }}"
+          name: "🚀 GoByTel Agent v${{ steps.version.outputs.VERSION }} — Electron Desktop App"
           body: |
-            # GoByTel Agent v${{ steps.version.outputs.VERSION }}
+            # 🚀 GoByTel Agent v${{ steps.version.outputs.VERSION }}
 
-            Descarga el instalador para instalar GoByTel Agent en tu PC.
+            **Hardware Bridge para Sistema POS GoByTel**
+
+            Aplicación desktop Electron para control de gaveta de efectivo y comunicación con sistema POS vía WebSocket.
+
+            ## 📥 Instalación
+
+            Descarga el instalador para tu Windows:
+            - **GoByTel-Agent-Setup-v${{ steps.version.outputs.VERSION }}.exe** — Instalador completo
+            - **GoByTel-Agent-Setup-latest.exe** — Versión más reciente (alias)
+
+            Ejecuta el instalador y sigue los pasos. La aplicación se inicia automáticamente al encender la PC.
+
+            ## ✨ Características
+
+            ✅ **Interfaz Gráfica** — Configuración visual de puerto COM
+            ✅ **Control de Gaveta** — Abre gaveta de efectivo ESC/POS
+            ✅ **Estado en Tiempo Real** — Monitorea estado de gaveta y conectividad
+            ✅ **WebSocket Server** — Puerto 9100 para comunicación con POS
+            ✅ **Auto-Actualización** — Detecta e instala nuevas versiones automáticamente
+            ✅ **Bandeja del Sistema** — Controla desde el icono en la esquina inferior derecha
+
+            ## 🔧 Requisitos
+
+            - Windows 10 o superior
+            - Impresora de recibos ESC/POS compatible
+            - Cable USB o puerto serial COM configurado
+
+            ## 📝 Notas
+
+            - Primera ejecución abre diálogo de configuración
+            - Selecciona el puerto COM donde está conectada la impresora
+            - Usa botón "Prueba" para verificar conectividad
+            - La aplicación se minimiza a bandeja, no se cierra
+
+            ## 🐛 Problemas Conocidos
+
+            - Windows SmartScreen puede mostrar advertencia (aplicación es segura)
+            - Requiere permisos de administrador para abrir gaveta
+
+            ---
+
+            **© 2026 Frank Borja** — https://github.com/fborjaz
+
+            **Cambios en esta versión**: Interfaz gráfica mejorada, control de gaveta robusto, monitoreo de estado.
           files: |
             dist/GoByTel-Agent-Setup-v${{ steps.version.outputs.VERSION }}.exe
             dist/GoByTel-Agent-Setup-latest.exe
