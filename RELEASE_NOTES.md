@@ -7,11 +7,13 @@ Migración completa desde servicio headless Node.js/NSSM a aplicación Electron 
 ## ✅ Fixes en v2.0.0
 
 ### 1. Auto-Updater (latest.yml)
+
 - **Problema**: electron-updater fallaba con error HTTP 404 al buscar `latest.yml`
 - **Solución**: Generar `latest.yml` automáticamente en GitHub Actions con SHA512 hash
 - **Resultado**: Auto-updateador ahora funciona correctamente
 
 ### 2. Validación de Gaveta
+
 - **Problema**: Test de gaveta siempre decía "éxito" sin validar realmente
 - **Solución**:
   - Timeout de 3 segundos para detectar dispositivos no conectados
@@ -20,6 +22,7 @@ Migración completa desde servicio headless Node.js/NSSM a aplicación Electron 
 - **Resultado**: Validación real de conexión del hardware
 
 ### 3. EULA/Acuerdo de Licencia
+
 - **Problema**: Instalador saltaba directamente sin mostrar términos de licencia
 - **Solución**:
   - Cambiar `oneClick: false` en NSIS configuración
@@ -27,16 +30,19 @@ Migración completa desde servicio headless Node.js/NSSM a aplicación Electron 
 - **Resultado**: Usuario debe aceptar antes de instalar
 
 ### 4. Copyright & Metadata
+
 - UI Footer: "© 2026 Frank Borja" con link a GitHub
 - NSIS Header: Copyright comment
 - electron-builder.yml: Copyright metadata
 
 ### 5. Estado de Gaveta
+
 - Mostrar "Sin Configurar" cuando no hay puerto COM
 - Mostrar "Desconectada" cuando el dispositivo no responde
 - Mejorar UX del status en tray icon
 
 ### 6. Visibilidad de Ventana
+
 - Cambiar `skipTaskbar: false` para que aparezca en Windows taskbar
 - Ventana visible cuando está minimizada
 
@@ -46,6 +52,7 @@ Descargar instalador desde:
 https://github.com/fborjaz/OmniPOS-Agent-Setup/releases/tag/v2.0.0
 
 O servidor GoByTel:
+
 ```
 /home/gobytel/htdocs/gobytel.com/uploads/downloads/
 GoByTel-Agent-Setup-v2.0.0.exe
