@@ -97,7 +97,8 @@ jobs:
             $yml += "  - url: https://github.com/fborjaz/OmniPOS-Agent-Setup/releases/download/v${{ steps.version.outputs.VERSION }}/GoByTel-Agent-Setup-v${{ steps.version.outputs.VERSION }}.exe"
             $yml += "    sha512: $hash"
             $yml += "    size: $size"
-            $yml -join "`n" | Out-File -FilePath "dist/latest.yml" -Encoding UTF8
+            $content = $yml -join [Environment]::NewLine
+            $content | Out-File -FilePath "dist/latest.yml" -Encoding UTF8 -NoNewline
             Write-Host "latest.yml creado"
           }
 
