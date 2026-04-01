@@ -46,22 +46,32 @@ jobs:
           # Actualizar package.json directamente (npm version falla si ya está en esa versión)
           $pkgContent = Get-Content package.json -Raw | ConvertFrom-Json
           $pkgContent.version = "${{ steps.version.outputs.VERSION }}"
-          $pkgContent | ConvertTo-Json | Set-Content package.json
+          $pkgContent | ConvertTo-Json -Depth 10 | Set-Content package.json
 
           # Actualizar constants.js
           $content = Get-Content src/shared/constants.js -Raw
-          $content = $content -replace "const VERSION\s*=.*", "const VERSION     = '${{ steps.version.outputs.VERSION }}';"
-          $content | Set-Content src/shared/constants.js
+          $content = $content -replace "const VERSION\s*=\s*'[^']*'", "const VERSION     = '${{ steps.version.outputs.VERSION }}'"
+          $content | Set-Content src/shared/constants.js -Encoding UTF8
 
       # ── 6. Build + Sign + Package con electron-builder ─────────────────
       - name: Build Electron app
+        shell: bash
         env:
           CSC_LINK: ${{ secrets.CODESIGN_PFX_BASE64 }}
           CSC_KEY_PASSWORD: ${{ secrets.CODESIGN_PFX_PASSWORD }}
         run: npx electron-builder --win --publish never
-        shell: powershell
 
-      # ── 7. Generar alias latest ────────────────────────────────────────
+      # ── 6.5. Verificar que electron-builder completó exitosamente ──────────
+      - name: Verificar build
+        shell: bash
+        run: |
+          echo "=== Contenido de dist/ ==="
+          if [ -d "dist" ]; then
+            ls -lh dist/GoByTel-Agent-Setup-v*.exe 2>/dev/null || echo "ERROR: No se encontró .exe"
+          else
+            echo "ERROR: el directorio dist/ no existe"
+            exit 1
+          fi
       - name: Generar alias GoByTel-Agent-Setup-latest.exe
         shell: powershell
         run: |
