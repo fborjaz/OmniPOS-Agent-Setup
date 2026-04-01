@@ -53,8 +53,7 @@ jobs:
         env:
           CSC_LINK: ${{ secrets.CODESIGN_PFX_BASE64 }}
           CSC_KEY_PASSWORD: ${{ secrets.CODESIGN_PFX_PASSWORD }}
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: npx electron-builder --win --publish always
+        run: npx electron-builder --win
         shell: powershell
 
       # ── 7. Generar alias latest ────────────────────────────────────────
@@ -67,6 +66,22 @@ jobs:
             Copy-Item $installer "dist\GoByTel-Agent-Setup-latest.exe"
             Write-Host "Alias creado: GoByTel-Agent-Setup-latest.exe"
           }
+
+      # ── 7.5 Crear GitHub Release con archivos compilados ──────────────────
+      - name: Crear GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.version.outputs.TAG }}
+          name: "GoByTel Agent v${{ steps.version.outputs.VERSION }}"
+          body: |
+            # GoByTel Agent v${{ steps.version.outputs.VERSION }}
+
+            Descarga el instalador para instalar GoByTel Agent en tu PC.
+          files: |
+            dist/GoByTel-Agent-Setup-v${{ steps.version.outputs.VERSION }}.exe
+            dist/GoByTel-Agent-Setup-latest.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # ── 8. Deploy al servidor GoByTel (ssh-action funciona en Windows) ──────
       - name: Subir installer al servidor GoByTel
