@@ -3,7 +3,7 @@ name: Build, Sign and Release GoByTel Agent
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 permissions:
   contents: write
@@ -22,8 +22,8 @@ jobs:
       - name: Configurar Node.js 20
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
 
       # ── 3. Instalar dependencias ───────────────────────────────────────
       - name: Instalar dependencias
@@ -68,14 +68,30 @@ jobs:
             Write-Host "Alias creado: GoByTel-Agent-Setup-latest.exe"
           }
 
-      # ── 8. Deploy al servidor GoByTel ──────────────────────────────────
+      # ── 8. Deploy al servidor GoByTel (ssh-action funciona en Windows) ──────
       - name: Subir installer al servidor GoByTel
-        uses: appleboy/scp-action@v0.1.7
+        uses: appleboy/ssh-action@master
         continue-on-error: true
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           password: ${{ secrets.DEPLOY_PASSWORD }}
-          source: "dist/GoByTel-Agent-Setup-v${{ steps.version.outputs.VERSION }}.exe,dist/GoByTel-Agent-Setup-latest.exe"
-          target: "/home/gobytel/htdocs/gobytel.com/uploads/downloads/"
-          strip_components: 1
+          script: |
+            mkdir -p /home/gobytel/htdocs/gobytel.com/uploads/downloads/
+            cd /home/gobytel/htdocs/gobytel.com/uploads/downloads/
+            # Cleanup old versions (keep last 3)
+            ls -t GoByTel-Agent-Setup-v*.exe 2>/dev/null | tail -n +4 | xargs -r rm
+
+      # ── 9. Enviar instaladores con rsync ───────────────────────────────────
+      - name: Enviar instaladores con rsync
+        shell: bash
+        env:
+          DEPLOY_PASSWORD: ${{ secrets.DEPLOY_PASSWORD }}
+        continue-on-error: true
+        run: |
+          which sshpass > /dev/null || choco install sshpass -y
+          sshpass -p "$DEPLOY_PASSWORD" rsync -avz --delete-after \
+            "dist/GoByTel-Agent-Setup-v${{ steps.version.outputs.VERSION }}.exe" \
+            "dist/GoByTel-Agent-Setup-latest.exe" \
+            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:/home/gobytel/htdocs/gobytel.com/uploads/downloads/" \
+            || echo "Note: rsync upload may have failed but workflow continues"
