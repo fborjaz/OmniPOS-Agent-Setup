@@ -55,11 +55,22 @@ jobs:
 
       # ── 6. Build + Sign + Package con electron-builder ─────────────────
       - name: Build Electron app
+        shell: powershell
         env:
           CSC_LINK: ${{ secrets.CODESIGN_PFX_BASE64 }}
           CSC_KEY_PASSWORD: ${{ secrets.CODESIGN_PFX_PASSWORD }}
         run: npx electron-builder --win --publish never
-        shell: powershell
+
+      # ── 6.5 Verificar que el build completó ────────────────────────────────
+      - name: Verificar build
+        shell: bash
+        run: |
+          if [ -d "dist" ] && ls dist/GoByTel-Agent-Setup-v*.exe 2>/dev/null; then
+            echo "✓ Build exitoso"
+          else
+            echo "✗ Error: .exe no encontrado"
+            exit 1
+          fi
 
       # ── 7. Generar alias latest ────────────────────────────────────────
       - name: Generar alias GoByTel-Agent-Setup-latest.exe
@@ -80,7 +91,6 @@ jobs:
           if ($installer) {
             $hash = (Get-FileHash -Path $installer.FullName -Algorithm SHA512).Hash
             $size = $installer.Length
-
             $latestYml = @"
 version: ${{ steps.version.outputs.VERSION }}
 files:
@@ -88,9 +98,8 @@ files:
     sha512: $hash
     size: $size
 "@
-
             $latestYml | Out-File -FilePath "dist/latest.yml" -Encoding UTF8
-            Write-Host "✅ latest.yml creado"
+            Write-Host "latest.yml creado"
           }
 
       # ── 7.6 Crear GitHub Release CON TODOS LOS ARCHIVOS ─────────────────────
