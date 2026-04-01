@@ -1,8 +1,6 @@
 appId: com.gobytel.agent
 productName: GoByTel Agent
-author:
-  name: Frank Borja
-  email: frank@gobytel.com
+copyright: © 2026 Frank Borja (https://github.com/fborjaz)
 
 directories:
   output: dist
